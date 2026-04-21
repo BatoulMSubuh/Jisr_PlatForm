@@ -17,7 +17,6 @@ return new class extends Migration
           ->constrained()
           ->cascadeOnDelete();
 
-    // وصف العملية
     $table->string('description');
 
    

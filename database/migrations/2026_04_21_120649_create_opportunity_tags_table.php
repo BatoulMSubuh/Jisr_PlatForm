@@ -27,7 +27,7 @@ return new class extends Migration
 
     $table->boolean('mandatory')->default(false);
 
-    $table->timestamps();
+
 
     $table->unique(['opportunity_id', 'tag_id']);
             $table->timestamps();

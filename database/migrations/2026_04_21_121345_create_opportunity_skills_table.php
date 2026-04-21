@@ -29,7 +29,6 @@ return new class extends Migration
 
     $table->decimal('weight', 3, 2)->default(1);
 
-    $table->timestamps();
 
     $table->unique(['opportunity_id', 'skill_id']);
             $table->timestamps();
