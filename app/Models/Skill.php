@@ -32,4 +32,11 @@ public function trends()
     return $this->hasMany(MarketTrend::class);
 }
 
+public function resources()
+{
+    return $this->belongsToMany(LearningResources::class, 'resource_skill_mappings')
+                ->withPivot('relevance_score')
+                ->withTimestamps();
+}
+
 }

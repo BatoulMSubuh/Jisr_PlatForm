@@ -14,4 +14,11 @@ class Company extends Model
                     ->withPivot('role')
                     ->withTimestamps();
     }
+
+    public function reviews()
+{
+    return $this->hasMany(CompanyReview::class);
+}
+
+
 }

@@ -26,4 +26,10 @@ class Opportunity extends Model
                 ->withPivot(['weight', 'mandatory'])
                 ->withTimestamps();
 }
+
+public function applications()
+{
+    return $this->hasMany(Application::class);
+}
+
 }

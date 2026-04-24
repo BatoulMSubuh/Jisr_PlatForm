@@ -158,4 +158,55 @@ public function verificationRequests()
     return $this->hasMany(VerificationRequest::class, 'applicant_user_id');
 }
 
+public function mentorReviews()
+{
+    return $this->hasMany(MentorReview::class, 'mentor_id');
+}
+
+public function givenReviews()
+{
+    return $this->hasMany(MentorReview::class, 'user_id');
+}
+
+public function companyReviews()
+{
+    return $this->hasMany(CompanyReview::class);
+}
+
+
+public function supervisorReviews()
+{
+    return $this->hasMany(SupervisorReview::class, 'supervisor_id');
+}
+
+public function givenSupervisorReviews()
+{
+    return $this->hasMany(SupervisorReview::class, 'user_id');
+}
+
+public function applications()
+{
+    return $this->hasMany(Application::class);
+}
+
+public function notificationPreference()
+{
+    return $this->hasOne(NotificationPreference::class);
+}
+
+public function notifications()
+{
+    return $this->hasMany(Notification::class);
+}
+
+public function receivedNotifications()
+{
+    return $this->hasMany(Notification::class, 'user_id');
+}
+
+public function sentNotifications()
+{
+    return $this->hasMany(Notification::class, 'actor_id');
+}
+
 }
