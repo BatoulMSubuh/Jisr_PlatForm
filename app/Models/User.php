@@ -209,4 +209,17 @@ public function sentNotifications()
     return $this->hasMany(Notification::class, 'actor_id');
 }
 
+
+public function conversations()
+{
+    return $this->belongsToMany(Conversation::class, 'conversation_participants')
+                ->withPivot('role')
+                ->withTimestamps();
+}
+
+public function sentMessages()
+{
+    return $this->hasMany(Message::class, 'sender_id');
+}
+
 }
