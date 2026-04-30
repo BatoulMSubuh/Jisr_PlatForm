@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('industry', 128)->nullable();
             $table->string('size', 32)->nullable();
-
+            $table->string('location')->nullable();
             $table->text('description')->nullable();    
             $table->string('website')->nullable();
 

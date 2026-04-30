@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('email',255)->unique();
             
             $table->string('password');
-            $table->boolean('is_active')->default(true);
+            $table->boolean('is_active')->default(false);
             $table->boolean('email_verified')->default(false);
             $table->boolean('is_verified_by_admin')->default(false);
             $table->text('profile_picture_url')->nullable();
