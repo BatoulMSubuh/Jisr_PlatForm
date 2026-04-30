@@ -30,11 +30,11 @@ class RegisterRequest extends FormRequest
 
             //  student fields
             'university' => 'required_if:role,student|string',
-            'major' => 'required_if:role,student|string',
-            'graduation_year' => 'required_if:role,student|integer|digits:4',
+            'major' => 'nullable:role,student|string',
+            'graduation_year' => 'nullable:role,student|integer|digits:4',
             'phone' => 'required_if:role,student|regex:/^09\d{8}$/',
             'bio' => 'nullable|string|max:255',
-        'profile_picture' => ['nullable', 'image', 'max:2048'],
+            'profile_picture' => ['nullable', 'image', 'max:2048'],
 
             //  company fields
             'company_name' => 'required_if:role,company|string',
