@@ -29,12 +29,11 @@ class CompanyRegisterStrategy implements RegisterStrategyInterface
             $user->assignRole('company');
 
             $company = $this->companyRepo->create([
-                // 'user_id' => $user->id,
                 'name' => $data['company_name'],
-                'industry' => $data['industry'],
-                'website' => $data['website'] ?? null,
-                'location' => $data['location'] ?? null,
-                'description' => $data['description'] ?? null,
+                // 'industry' => $data['industry'],
+                // 'website' => $data['website'] ?? null,
+                // 'location' => $data['location'] ?? null,
+                // 'description' => $data['description'] ?? null,
             ]);
             $user->companies()->attach($company->id, [
     'role' => 'owner'
