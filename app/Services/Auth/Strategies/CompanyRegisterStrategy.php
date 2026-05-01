@@ -24,15 +24,21 @@ class CompanyRegisterStrategy implements RegisterStrategyInterface
                 'name' => $data['name'],
                 'email' => $data['email'],
                 'password' => Hash::make($data['password']),
+                'is_verified_by_admin' => false,
             ]);
 
             $user->assignRole('company');
+            $documentationFile = null;
+            if (isset($data['documentation_file'])) {
+                $documentationFile = $data['documentation_file']->store('docs', 'public');
+            }
+
 
             $company = $this->companyRepo->create([
-                'name' => $data['company_name'],
-                // 'industry' => $data['industry'],
-                // 'website' => $data['website'] ?? null,
-                // 'location' => $data['location'] ?? null,
+                'industry' => $data['industry'],
+                'website' => $data['website'] ?? null,
+                'location' => $data['location'] ?? null,
+                'documentation_file' => $documentationFile,
                 // 'description' => $data['description'] ?? null,
             ]);
             $user->companies()->attach($company->id, [

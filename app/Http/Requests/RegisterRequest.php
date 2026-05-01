@@ -37,10 +37,10 @@ class RegisterRequest extends FormRequest
             // 'profile_picture' => ['nullable', 'image', 'max:2048'],
 
             //  company fields
-            'company_name' => 'required_if:role,company|string',
-            // 'industry' => 'required_if:role,company|string',
-            // 'website' => 'nullable|url',
-            // 'location' => 'required_if:role,company|string',
+             'industry' => 'required_if:role,company|string',
+             'website' => 'nullable|url',
+             'documentation_file' => 'required_if:role,company|file|max:2048',
+             'location' => 'required_if:role,company|string',
             // 'description' => 'nullable|string|max:1000',
             
         ];
