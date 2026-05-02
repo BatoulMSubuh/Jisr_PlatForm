@@ -51,12 +51,23 @@ public function forgetPassword(Request $request)
     }
 
 
-public function resetPassword(Request $request)
+public function verifyOTPresetPassword(Request $request)
     {
         $request->validate([
             'email' => ['required', 'email', 'exists:users,email'],
             'code' => ['required', 'digits:6'],
-            'password' => ['required', 'min:8', 'confirmed'],
+        ]);
+
+        $response = $this->authService->verifyOtp($request->all());
+
+        return response()->json($response);
+    }
+
+    public function resetPassword(Request $request)
+    {
+        $request->validate([
+            'code' => ['required', 'digits:6'],
+            'new_password' => ['required', 'string', 'min:6', 'confirmed'],
         ]);
 
         $response = $this->authService->resetPassword($request->all());

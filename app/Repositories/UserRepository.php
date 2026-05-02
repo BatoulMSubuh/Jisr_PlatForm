@@ -17,5 +17,7 @@ class UserRepository implements UserRepositoryInterface
 {
   return User::where('email', $email)->firstOrFail();
   }
+  
+
 
 }

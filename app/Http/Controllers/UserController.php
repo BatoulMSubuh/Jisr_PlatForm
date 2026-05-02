@@ -3,46 +3,51 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Services\AdminService;
+use App\Traits\ApiResponse;
 
 class UserController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    use ApiResponse;
+
+    protected $adminService;
+
+    public function __construct(AdminService $adminService)
     {
-        //
+        $this->adminService = $adminService; 
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function getUnverifiedCompanies()
     {
-        //
+        $companies = $this->adminService->getUnverifiedCompanies();
+
+        return $this->success(
+            'Unverified companies retrieved successfully.', 
+            $companies 
+        );
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function getCompanyDetails($userId)
     {
-        //
+        $companyDetails = $this->adminService->getCompanyDetailsByUserId($userId);
+
+        return $this->success(
+            'Company details retrieved successfully.',  
+            [
+                'company' => $companyDetails['company'] ?? null,
+                'documentation_file' => $companyDetails['documentation_file'] ?? null
+            ] 
+        );
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    public function verifyCompany($id)
     {
-        //
+        if ($this->adminService->verifyCompany($id)) {
+            return $this->success('Company verified successfully.');
+        }
+
+        return $this->error('Company not found or already verified.', [], 404);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
-    }
+    // Other methods can be implemented later
 }

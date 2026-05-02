@@ -4,6 +4,7 @@ namespace App\Services\Auth;
 
 use App\Events\LoginOtpRequested;
 use App\Events\PasswordResetOtpRequested;
+use App\Models\OtpCode;
 use App\Models\User;
 use App\Repositories\UserRepository;
 use App\Services\Otp\OtpService;
@@ -127,47 +128,32 @@ public function forgetPassword(string $email): array
 
 public function resetPassword(array $data): array
 {
-    $user = $this->userRepository->findByEmailOrFail($data['email']);
+    $otp = OtpCode::where('used', false)->first();  
 
-    $valid = $this->otpService->verifyOtpByType(
-        user: $user,
-        code: $data['code'],
-        type: 'password_reset'
-    );
-
-    if (! $valid) {
+    if (!$otp || !Hash::check($data['code'], $otp->code)) {
         throw ValidationException::withMessages([
-            'code' => ['OTP expired or invalid'],
+            'code' => ['Invalid or expired OTP.'],
         ]);
     }
 
+    if ($otp->expires_at < now()) {
+        throw ValidationException::withMessages([
+            'code' => 'OTP expired.',
+        ]);
+    
+    $user = User::findOrFail($otp->user_id);
+
     $user->update([
-        'password' => Hash::make($data['password']),
+        'password' => Hash::make($data['new_password']),
     ]);
 
+    $otp->update(['used' => true]);
+
     $user->tokens()->delete();
+
     return [
         'message' => 'Password reset successfully',
     ];
-}
-
-
-public function logout(Request $request): array
-{
-    $request->user()->currentAccessToken()->delete();
-
-    return [
-        'message' => 'Logged out successfully',
-    ];
-} 
-
-public function logoutAll(User $user): array
-{
-    $user->tokens()->delete();
-
-    return [
-        'message' => 'Logged out from all devices',
-    ];
-}
-
+    }
+  }
 }
