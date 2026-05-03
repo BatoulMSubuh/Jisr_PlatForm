@@ -17,7 +17,10 @@ class UserRepository implements UserRepositoryInterface
 {
   return User::where('email', $email)->firstOrFail();
   }
+
+ public function listUsers()
+  {
+    return User::all();
+  }
   
-
-
 }

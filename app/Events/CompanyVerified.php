@@ -2,6 +2,8 @@
 
 namespace App\Events;
 
+use App\Models\Company;
+use App\Models\User;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
@@ -13,18 +15,16 @@ use Illuminate\Queue\SerializesModels;
 class CompanyVerified
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
+    
 
-     public $company;
-     public $user;
     /**
      * Create a new event instance.
      */
-    public function __construct($company, $user)
-    {
-         $this->company = $company;
-        $this->user = $user;
-    }
-
+    public function __construct(
+       
+        public Company $company,
+        public User $user
+    ){ }
     /**
      * Get the channels the event should broadcast on.
      *

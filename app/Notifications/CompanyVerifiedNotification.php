@@ -2,23 +2,20 @@
 
 namespace App\Notifications;
 
+use App\Models\Company;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class CompanyVerifiedNotification extends Notification
+class CompanyVerifiedNotification extends Notification implements ShouldQueue
 {
     use Queueable;
-     public $company;
 
     /**
      * Create a new notification instance.
      */
-    public function __construct($company)
-    {
-         $this->company = $company;
-    }
+    public function __construct(public Company $company) {}
 
     /**
      * Get the notification's delivery channels.
@@ -30,12 +27,15 @@ class CompanyVerifiedNotification extends Notification
         return ['mail'];
     }
 
+
     /**
      * Get the mail representation of the notification.
      */
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
+                    ->subject('Company Verified Notification')
+                    ->greeting('Hello ' . $notifiable->name)
                     ->line('Your company has been verified successfully.')
                     ->action('View Company', url('/company/' . $this->company->id))
                     ->line('Thank you for using our platform!');

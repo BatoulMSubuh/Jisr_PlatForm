@@ -15,14 +15,12 @@ class CompanyResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-         'id' => $this->id,
-            'name' => $this->name,
-            'email' => $this->email,
+            'id' => $this->id,
             'industry' => $this->industry,
             'location' => $this->location,
             'website' => $this->website,
-            'status' => $this->is_verified_by_admin ? 'Verified' : 'Not Verified',
-            'documentation_file' => asset('storage/' . $this->documentation_file),
+            'documentation_file' => url('storage/' . $this->documentation_file),
+            'users' => UserResource::collection($this->users), 
         ];
     }
 }

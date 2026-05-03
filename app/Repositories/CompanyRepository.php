@@ -4,6 +4,7 @@ namespace App\Repositories;
 use App\Models\Company;
 use App\Interfaces\CompanyRepositoryInterface;
 use App\Models\User;
+use Workbench\App\Models\User as ModelsUser;
 
 class CompanyRepository implements CompanyRepositoryInterface
 {
@@ -12,9 +13,16 @@ class CompanyRepository implements CompanyRepositoryInterface
         return Company::create($data);
     }
 
+     public function findById($companyId):?Company
+    {
+
+        return Company::findOrFail($companyId);
+
+    }
+
     public function getUnverifiedCompanies()
     {
-        return Company::where('is_verified_by_admin', false)->get();
+        return User::where('is_verified_by_admin', false)->get();
     }
 
      public function getCompanyByUserId($userId)
@@ -22,5 +30,15 @@ class CompanyRepository implements CompanyRepositoryInterface
         $user=User::findOrFail($userId);
         $company=Company::where('user_id', $userId)->first();
         return $company;
+    }
+
+    public function verify(Company $company): void
+{
+    $user = $company->user;
+
+    if ($user) {
+        $user->is_verified_by_admin = true;
+        $user->save();
+       }
     }
 }

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdminController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
@@ -21,8 +22,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
 // Admin
 Route::middleware('auth:admin')-> prefix('admin')->group(function () {
-    Route::get('/users', [UserController::class, 'listUsers']);
-    Route::get('/CompanyUnverified', [UserController::class, 'getUnverifiedCompanies']);
-
+    Route::get('/users', [AdminController::class, 'listUsers']);
+    Route::get('/CompanyUnverified', [AdminController::class, 'getUnverifiedCompanies']);
+    Route::post('/companiesVerify/{companyId}', [AdminController::class, 'verifyCompany']);
+    Route::get('/companyDetails/{companyId}', [AdminController::class, 'getCompanyDetails']);
     // Route::post('/users/{id}/assign-role', [AdminController::class, 'assignRole']);
 });

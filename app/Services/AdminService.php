@@ -2,17 +2,21 @@
 
 namespace App\Services;
 
+use App\Events\CompanyVerified;
 use App\Repositories\CompanyRepository;
 use App\Models\Company;
+use App\Repositories\UserRepository;
 use Illuminate\Support\Facades\Storage;
 
-class CompanyService
+class AdminService
 {
     protected $companyRepository;
+    protected $userRepository;
 
-    public function __construct(CompanyRepository $companyRepository)
+    public function __construct(CompanyRepository $companyRepository, UserRepository $userRepository    )
     {
         $this->companyRepository = $companyRepository;
+        $this->userRepository = $userRepository;
     }
 
     /**
@@ -25,10 +29,14 @@ class CompanyService
         return $this->companyRepository->getUnverifiedCompanies();
     }
 
-   
-    public function getCompanyDetailsByUserId($userId)
+    public function listUsers()
     {
-        $company = $this->companyRepository->getCompanyByUserId($userId);
+        return $this->userRepository->listUsers();
+    }   
+    public function getCompanyDetailsByUserId($companyId)
+    {
+        $company = $this->companyRepository->findById($companyId);
+        $user = $company->load('users');
 
         if (!$company) {
             return null;
@@ -43,15 +51,58 @@ class CompanyService
     }
 
 
-     public function verifyCompany(int $companyId): bool
-    {
-       
-            if($company = Company::findOrFail($companyId)){
+      public function verifyCompany(int $companyId): array
+{   
+    $company = $this->companyRepository->findById($companyId);
 
-            $company->is_verified_by_admin = true;
-            $company->save();
-            return true;
-            }
-            return false;
-        }
+    if (!$company) {
+        return [
+            'status' => false,
+            'message' => 'Company not found'
+        ];
+    }
+
+    $company->load('users');
+    $user = $company->users->first();
+
+    if (!$user) {
+        return [
+            'status' => false,
+            'message' => 'Company has no associated user'
+        ];
+    }
+
+    if ($user->is_verified_by_admin) {
+        return [
+            'status' => false,
+            'message' => 'Company already verified'
+        ];
+    }
+
+
+    $user->is_verified_by_admin = true;
+    $user->save();
+
+    //  event(new CompanyVerified($company, $user));
+
+     event(new CompanyVerified(
+        company: $company,
+        user: $user,
+    ));
+
+
+
+    return [
+        'status' => true,
+        'message' => 'Company verified successfully'
+    ];
+}
+
+
+    public function findById($id)
+{
+    $company = $this->companyRepository->findById($id);
+    $company->load('users');
+    return $company;
+}
     }
