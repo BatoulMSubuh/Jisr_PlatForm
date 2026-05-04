@@ -26,6 +26,7 @@ Route::middleware('auth:admin')-> prefix('admin')->group(function () {
     Route::get('/users', [AdminController::class, 'listUsers']);
     Route::get('/CompanyUnverified', [AdminController::class, 'getUnverifiedCompanies']);
     Route::post('/companiesVerify/{companyId}', [AdminController::class, 'verifyCompany']);
+    Route::post('/companiesReject/{companyId}', [AdminController::class, 'rejectCompany']);
     Route::get('/companyDetails/{companyId}', [AdminController::class, 'getCompanyDetails']);
     // Route::post('/users/{id}/assign-role', [AdminController::class, 'assignRole']);
 });

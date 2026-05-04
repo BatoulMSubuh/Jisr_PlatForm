@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('password');
             $table->boolean('is_active')->default(true);
             $table->boolean('email_verified')->default(false);
-            $table->enum('verification_status', ['pending', 'accepted', 'rejected'])->default('pending');           
+            $table->enum('is_verified_by_admin', ['pending', 'accepted', 'rejected'])->default('pending');        
             $table->text('profile_picture_url')->nullable();
             $table->text('bio')->nullable();
             

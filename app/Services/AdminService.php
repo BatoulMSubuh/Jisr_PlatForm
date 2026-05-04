@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Events\CompanyRejected;
 use App\Events\CompanyVerified;
 use App\Repositories\CompanyRepository;
 use App\Models\Company;
@@ -54,6 +55,16 @@ protected UserRepository $userRepository;
     }
 
 
+    public function findById(int $id)
+{
+    $company = $this->companyRepository->findById($id);
+    $company->load('users');
+    return $company;
+    }
+
+
+
+
       public function verifyCompany(int $companyId): array
 {   
     $company = $this->companyRepository->findById($companyId);
@@ -75,25 +86,21 @@ protected UserRepository $userRepository;
         ];
     }
 
-    if ($user->is_verified_by_admin) {
-        return [
-            'status' => false,
-            'message' => 'Company already verified'
-        ];
-    }
+   if ($user->is_verified_by_admin === 'accepted') {
+    return [
+        'status' => false,
+        'message' => 'Company already verified'
+    ];
+}
 
 
-    $user->is_verified_by_admin = true;
+    $user->is_verified_by_admin = 'accepted';
     $user->save();
-
-    //  event(new CompanyVerified($company, $user));
 
      event(new CompanyVerified(
         company: $company,
         user: $user,
     ));
-
-
 
     return [
         'status' => true,
@@ -101,11 +108,47 @@ protected UserRepository $userRepository;
     ];
 }
 
+    public function rejectCompany(int $companyId): array
+{   
+    $company = $this->companyRepository->findById($companyId);
 
-    public function findById(int $id)
-{
-    $company = $this->companyRepository->findById($id);
-    $company->load('users');
-    return $company;
+    if (!$company) {
+        return [
+            'status' => false,
+            'message' => 'Company not found'
+        ];
     }
+
+    $company->load('users');
+    $user = $company->users->first();
+
+    if (!$user) {
+        return [
+            'status' => false,
+            'message' => 'Company has no associated user'
+        ];
+    }
+
+    if ($user->is_verified_by_admin === 'rejected') {
+        return [
+            'status' => false,
+            'message' => 'Company already rejected'
+        ];
+    }
+
+    $user->is_verified_by_admin = 'rejected';
+    $user->save();
+
+
+    event(new CompanyRejected(
+        company: $company,
+        user: $user,
+    ));
+
+    return [
+        'status' => true,
+        'message' => 'Company rejected successfully'
+    ];
+}
+
 }

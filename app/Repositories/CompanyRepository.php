@@ -22,7 +22,7 @@ class CompanyRepository implements CompanyRepositoryInterface
 
     public function getUnverifiedCompanies()
     {
-        return User::where('is_verified_by_admin', false)->get();
+        return User::where('is_verified_by_admin', 'pending')->get();
     }
 
      public function getCompanyByUserId(int $userId)
@@ -37,7 +37,7 @@ class CompanyRepository implements CompanyRepositoryInterface
     $user = $company->user;
 
     if ($user) {
-        $user->is_verified_by_admin = true;
+        $user->is_verified_by_admin = 'accepted';
         $user->save();
        }
     }

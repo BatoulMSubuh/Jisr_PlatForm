@@ -54,11 +54,10 @@ class AdminController extends Controller
         );
     }
 
-    public function verifyCompany($id)
+    public function verifyCompany(int $id)
     {
         $result = $this->adminService->verifyCompany($id);
 
-        // ❌ حالة الخطأ (موجودة أو محققة مسبقاً أو ما في يوزر)
         if (!$result['status']) {
             return $this->error(
                 $result['message'],
@@ -66,8 +65,27 @@ class AdminController extends Controller
                 400
             );
         }
+        $company = $this->adminService->findById($id);
 
-        // ✅ نجاح
+        return $this->success(
+            $result['message'],
+            new CompanyResource($company),
+            200
+        );
+    }
+
+
+     public function rejectCompany(int $id)
+    {
+        $result = $this->adminService->rejectCompany($id);
+
+        if (!$result['status']) {
+            return $this->error(
+                $result['message'],
+                [],
+                400
+            );
+        }
         $company = $this->adminService->findById($id);
 
         return $this->success(

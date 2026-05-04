@@ -56,6 +56,13 @@ public function login(array $data): array
          'email' => 'Invalid email or password', 
          ]);
     }
+
+    if ($user->hasRole('company') && $user->is_verified_by_admin != 'accepted') {
+        throw ValidationException::withMessages([
+            'email' => 'Your account is not verified by admin yet',
+        ]);
+    }
+
     $otpData =$this->otpService->generateLoginOtp($user);
 
      event(new LoginOtpRequested(

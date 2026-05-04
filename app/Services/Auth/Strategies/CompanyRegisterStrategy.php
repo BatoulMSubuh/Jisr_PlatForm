@@ -24,7 +24,6 @@ class CompanyRegisterStrategy implements RegisterStrategyInterface
                 'name' => $data['name'],
                 'email' => $data['email'],
                 'password' => Hash::make($data['password']),
-                'is_verified_by_admin' => false,
             ]);
 
             $user->assignRole('company');
