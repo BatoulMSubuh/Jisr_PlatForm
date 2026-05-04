@@ -14,7 +14,8 @@ Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/login/verify-otp', [AuthController::class, 'verifyLoginOtp']);
 Route::post('/password/forgot', [AuthController::class, 'forgetPassword']);
-Route::post('/password/reset', [AuthController::class, 'resetPassword']);
+Route::post('/password/reset/verify-otp', [AuthController::class, 'verifyOTPresetPassword']);
+Route::post('/password/reset', [AuthController::class, 'resetPassword'])->middleware('auth:admin');
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::post('/logout-all', [AuthController::class, 'logoutAll']);

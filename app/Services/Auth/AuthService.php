@@ -10,6 +10,7 @@ use App\Repositories\UserRepository;
 use App\Services\Otp\OtpService;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;  
 
@@ -29,8 +30,8 @@ class AuthService
 
 public function registerFromRequest(Request $request): array
 {
-       $data = $request->validated();
- $data['profile_picture'] = $request->file('profile_picture');
+  $data = $request->validated();
+  $data['profile_picture'] = $request->file('profile_picture');
 
  return $this->register(
         $request->input('role'),
@@ -86,27 +87,6 @@ public function verifyLoginOtp(array $data): array
     ];
 }
 
-public function generateResetOtp(User $user): array
-{
-    $user->otpCodes()
-        ->where('type', 'password_reset')
-        ->where('used', false)
-        ->delete();
-
-    $plainCode = (string) random_int(100000, 999999);
-
-    $otp = $user->otpCodes()->create([
-        'code' => Hash::make($plainCode),
-        'type' => 'password_reset',
-        'expires_at' => now()->addMinutes(10),
-        'used' => false,
-    ]);
-
-    return [
-        'otp' => $otp,
-        'plain_code' => $plainCode,
-    ]; 
-}
 
 public function forgetPassword(string $email): array
 {
@@ -124,30 +104,57 @@ public function forgetPassword(string $email): array
     ];
 }
 
+public function generateResetOtp(User $user): array
+{
+    $user->otpCodes()
+        ->where('type', 'password_reset')
+        ->where('used', false)
+        ->delete();
+
+    $plainCode = (string) random_int(100000, 999999);
+
+    $otp = $user->otpCodes()->create([
+        'code' => Hash::make($plainCode),
+        'type' => 'password_reset',
+        'expires_at' => now()->addMinutes(10),
+        'used' => false,
+    ]);
+      
+    return [
+        'otp' => $otp,
+        ]; 
+}
+
+ public function getUserByOTP(string $OTP): User
+    {
+        return $this->userRepository->getUserByOTP($OTP, 'password_reset');
+    }
 
 
 public function resetPassword(array $data): array
 {
-    $otp = OtpCode::where('used', false)->first();  
+    // $user = User::whereNotNull('reset_token')->first();
 
-    if (!$otp || !Hash::check($data['code'], $otp->code)) {
-        throw ValidationException::withMessages([
-            'code' => ['Invalid or expired OTP.'],
-        ]);
-    }
+    // if (!$user) {
+    //     throw ValidationException::withMessages([
+    //         'token' => ['Invalid token'],
+    //     ]);
+    // }
 
-    if ($otp->expires_at < now()) {
-        throw ValidationException::withMessages([
-            'code' => 'OTP expired.',
-        ]);
-    
-    $user = User::findOrFail($otp->user_id);
-
+    // if (
+    // !hash_equals($user->reset_token, hash('sha256', $data['token'])) 
+    //     $user->reset_token_expires_at < now()
+    // ) {
+    //     throw ValidationException::withMessages([
+    //         'token' => ['Invalid or expired token'],
+    //     ]);
+    // }
+    $user = Auth::user();
     $user->update([
         'password' => Hash::make($data['new_password']),
+        // 'reset_token' => null,
+        // 'reset_token_expires_at' => null,
     ]);
-
-    $otp->update(['used' => true]);
 
     $user->tokens()->delete();
 
@@ -155,5 +162,31 @@ public function resetPassword(array $data): array
         'message' => 'Password reset successfully',
     ];
     }
-  }
+
+
+    public function logout()
+{
+    $user = Auth::user();
+    $user->currentAccessToken()->delete();
+
+    return [
+        'status' => true,
+        'message' => 'Logged out successfully'
+    ];
 }
+
+
+public function logoutAll()
+{
+    $user = Auth::user();
+
+    $user->tokens()->delete();
+
+    return [
+        'status' => true,
+        'message' => 'Logged out from all devices'
+    ];
+}
+
+
+  }

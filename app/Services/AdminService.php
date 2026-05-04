@@ -8,10 +8,13 @@ use App\Models\Company;
 use App\Repositories\UserRepository;
 use Illuminate\Support\Facades\Storage;
 
+
+
 class AdminService
 {
-    protected $companyRepository;
-    protected $userRepository;
+
+protected CompanyRepository $companyRepository;
+protected UserRepository $userRepository;
 
     public function __construct(CompanyRepository $companyRepository, UserRepository $userRepository    )
     {
@@ -33,7 +36,7 @@ class AdminService
     {
         return $this->userRepository->listUsers();
     }   
-    public function getCompanyDetailsByUserId($companyId)
+    public function getCompanyDetailsByUserId(int $companyId)
     {
         $company = $this->companyRepository->findById($companyId);
         $user = $company->load('users');
@@ -99,10 +102,10 @@ class AdminService
 }
 
 
-    public function findById($id)
+    public function findById(int $id)
 {
     $company = $this->companyRepository->findById($id);
     $company->load('users');
     return $company;
-}
     }
+}

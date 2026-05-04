@@ -13,7 +13,7 @@ class CompanyRepository implements CompanyRepositoryInterface
         return Company::create($data);
     }
 
-     public function findById($companyId):?Company
+     public function findById(int $companyId):?Company
     {
 
         return Company::findOrFail($companyId);
@@ -25,7 +25,7 @@ class CompanyRepository implements CompanyRepositoryInterface
         return User::where('is_verified_by_admin', false)->get();
     }
 
-     public function getCompanyByUserId($userId)
+     public function getCompanyByUserId(int $userId)
     {
         $user=User::findOrFail($userId);
         $company=Company::where('user_id', $userId)->first();

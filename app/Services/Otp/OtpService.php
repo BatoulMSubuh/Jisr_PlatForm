@@ -39,7 +39,7 @@ class OtpService
     ];
 }
 
-public function verifyOtpByType(User $user, string $code, string $type): bool{
+public function verifyOtpByType(User $user, string $code, string $type): string{
     $otp = $user->otpCodes()
         ->where('type', $type)
         ->where('used', false)
@@ -48,40 +48,37 @@ public function verifyOtpByType(User $user, string $code, string $type): bool{
         ->first();
 
     if (! $otp) {
-        return false;
+        return 'Invalid OTP or expired';
     }
 
     if (! Hash::check($code, $otp->code)) {
-        return false;
+        return 'Invalid OTP';
     }
 
     $otp->update(['used' => true]);
 
-    return true;
+    return 'Your OTP is verified successfully';
 }
 
 public function generateResetOtp(User $user): array
 {
-    $user->otpCodes()
-        ->where('type', 'password_reset')
-        ->where('used', false)
-        ->delete();
+    $user->otpCodes() ->where('type', 'password_reset') 
+    ->where('used', false)
+     ->delete(); 
+     $plainCode = (string) random_int(100000, 999999); 
+     $otp = $user->otpCodes()->create([ 'code' => Hash::make($plainCode), 
+     'type' => 'password_reset', 'expires_at' => now()->addMinutes(10), 'used' => false, ]);
+       return [ 
+        'otp' => $otp, 
+        'plain_code' => $plainCode, 
+        ]; 
+    }
 
-    $plainCode = (string) random_int(100000, 999999);
-
-    $otp = $user->otpCodes()->create([
-        'code' => Hash::make($plainCode),
-        'type' => 'password_reset',
-        'expires_at' => now()->addMinutes(10),
-        'used' => false,
-    ]);
-
-    return [
-        'otp' => $otp,
-        'plain_code' => $plainCode,
-    ];
-}
-
-
+    public function verifyOtpByReset(User $user, string $code, string $type): string
+    {
+        $this->verifyOtpByType($user, $code, $type);
+        $token = $user->createToken('api-token')->plainTextToken;
+        return $token;
+    }
 
 }

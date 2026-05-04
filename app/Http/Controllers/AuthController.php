@@ -7,13 +7,16 @@ use App\Http\Requests\RegisterRequest;
 use App\Http\Requests\VerifyLoginOtpRequest;
 use App\Models\User;
 use App\Services\Auth\AuthService;
+use App\Services\Otp\OtpService;
 use Illuminate\Http\Request;
+
 
 
 class AuthController extends Controller
 {
     public function __construct(
-        private AuthService $authService
+        private AuthService $authService,
+        private OtpService $otpService
     ) {}
 
     public function register(RegisterRequest  $request)
@@ -54,19 +57,21 @@ public function forgetPassword(Request $request)
 public function verifyOTPresetPassword(Request $request)
     {
         $request->validate([
-            'email' => ['required', 'email', 'exists:users,email'],
             'code' => ['required', 'digits:6'],
         ]);
+        $user = $this->authService->getUserByOTP($request->code);
 
-        $response = $this->authService->verifyOtp($request->all());
+        $response = $this->otpService->verifyOtpByReset($user, $request->code, 'password_reset');
 
-        return response()->json($response);
+        return response([
+            'message' => "OTP verification successful",
+            'token' => $response
+        ]);
     }
 
     public function resetPassword(Request $request)
     {
         $request->validate([
-            'code' => ['required', 'digits:6'],
             'new_password' => ['required', 'string', 'min:6', 'confirmed'],
         ]);
 
@@ -75,17 +80,17 @@ public function verifyOTPresetPassword(Request $request)
         return response()->json($response);
     }
 
-    public function logout(Request $request)
+    public function logout()
     {
         return response()->json(
-            $this->authService->logout($request)
+            $this->authService->logout()
         );
     }
 
-    public function logoutAll(User $user)
+    public function logoutAll()
     {
         return response()->json(
-            $this->authService->logoutAll($user)
+            $this->authService->logoutAll()
         );
     }
 
